@@ -1,7 +1,7 @@
 #summary An example of using the prauth gateway for authentication.
-#labels Example
+#labels Phase-Design
 
-= Use Case =
+= Example =
 
 *User:* 
 Name: John Galt
