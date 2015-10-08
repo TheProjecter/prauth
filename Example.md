@@ -1,0 +1,53 @@
+# Example #
+
+**User:**
+Name: John Galt
+Email: john@example.org
+
+**Prauth Gateway:**
+URL: http://example.org/prauth/
+
+**Prauth Client:**
+Domain: http://blogger.com/
+Return URL: http://blogger.com/prauth/
+
+**Shared Secret:**
+Secret1234
+
+# Using Prauth #
+
+User John Galt tries to access http://blogger.com/johngalt/admin/ .
+
+Blogger.com stores this request in a local data structure as:
+```
+  token1234: {
+    url: 'http://blogger.com/johngalt/admin/',
+    timestamp: '1305757281'
+  }
+```
+It then redirects the user to:
+http://example.org/prauth/?return=http://blogger.com/prauth/token1234
+
+The Prauth gateway authenticates the user and generates the following information packet:
+```
+i = URL_Encode(
+      Base64_Encode(
+        JSON_Encode( 
+          {
+            name: "John Galt",
+            email: "john@example.org",
+            _formula: "name,email,_secret,_return",
+            _token: "John Galtjohn@example.orgSecret1234http://blogger.com/prauth/token1234"
+          }
+        )
+      )
+    )
+```
+
+Let's call the resulting string to be <information packet>.
+
+After authentication is done, the prauth gateway redirects the user to: http://blogger.com/prauth/token1234?i=<information packet>.
+
+The prauth client at blogger.com now can validate the user by regenerating the token using the user data and formula in the information packet against the token in the same packet. It can also validate against the timestamp it stored locally for timeouts and can delete the token1234 data so that the same request cannot be repeated.
+
+Once authenticated via prauth, blogger.com can create an authenticated session and even store a persistent cookie to save the session.
